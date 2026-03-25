@@ -46,19 +46,22 @@
         .editable-active {
             outline: 2px dashed var(--color-primary) !important;
             outline-offset: 4px;
-            background-color: rgba(0,0,0, 0.05);
+            background-color: rgba(236, 72, 153, 0.05);
             cursor: text;
-            transition: all 0.2s, margin 0.2s ease, font-size 0.2s ease;
+            transition: outline 0.2s, background-color 0.2s;
             border-radius: 4px;
+            min-height: 1em;
+            display: inline-block;
+            width: auto;
         }
         .editable-active:hover {
-            background-color: rgba(0,0,0, 0.1);
+            background-color: rgba(236, 72, 153, 0.15);
         }
         .image-edit-overlay {
             display: none;
             position: absolute;
             inset: 0;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.6);
             align-items: center;
             justify-content: center;
             z-index: 20;
@@ -82,7 +85,7 @@
             font-size: 12px;
             font-family: sans-serif;
             font-weight: bold;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
             border: 1px solid rgba(255,255,255,0.2);
         }
         .editable-mode section:hover .section-edit-btn,
@@ -106,23 +109,23 @@
     <!-- Barra de Herramientas de Texto Avanzada -->
     <div id="textToolbar" class="hidden fixed top-24 left-1/2 transform -translate-x-1/2 z-[90] bg-white p-4 rounded-2xl shadow-2xl border border-gray-200 flex flex-col gap-3 font-sans text-sm w-max">
         <div class="text-[11px] text-pink-600 font-bold text-center bg-pink-50 rounded-lg p-2 border border-pink-100">
-            ✏️ Escribe directamente en la página para cambiar los textos
+            ✏️ Estás editando un texto (escribe para cambiarlo)
         </div>
         <div class="flex gap-5 items-center justify-center">
             <div class="flex flex-col items-center">
                 <span class="text-[10px] text-gray-500 font-bold mb-1">Tamaño</span>
                 <div class="flex gap-1">
-                    <button id="tt-size-down" class="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded font-bold">-</button>
-                    <button id="tt-size-up" class="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded font-bold">+</button>
+                    <button id="tt-size-down" class="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded font-bold transition-colors">-</button>
+                    <button id="tt-size-up" class="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded font-bold transition-colors">+</button>
                 </div>
             </div>
             <div class="w-px h-10 bg-gray-200"></div>
             <div class="flex flex-col items-center">
                 <span class="text-[10px] text-gray-500 font-bold mb-1">Alinear</span>
                 <div class="flex gap-1">
-                    <button id="tt-align-left" class="px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded">⬅️</button>
-                    <button id="tt-align-center" class="px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded">⏺️</button>
-                    <button id="tt-align-right" class="px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded">➡️</button>
+                    <button id="tt-align-left" class="px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded transition-colors">⬅️</button>
+                    <button id="tt-align-center" class="px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded transition-colors">⏺️</button>
+                    <button id="tt-align-right" class="px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded transition-colors">➡️</button>
                 </div>
             </div>
             <div class="w-px h-10 bg-gray-200"></div>
@@ -135,23 +138,23 @@
                 <span class="text-[10px] text-gray-500 font-bold mb-1">Mover Libremente</span>
                 <div class="grid grid-cols-3 gap-1 place-items-center">
                     <div></div>
-                    <button id="tt-move-up" class="w-6 h-6 flex items-center justify-center bg-gray-100 hover:bg-gray-300 rounded leading-none text-xs font-bold" title="Subir">↑</button>
+                    <button id="tt-move-up" class="w-6 h-6 flex items-center justify-center bg-gray-100 hover:bg-gray-300 rounded leading-none text-xs font-bold transition-colors" title="Subir">↑</button>
                     <div></div>
-                    <button id="tt-move-left" class="w-6 h-6 flex items-center justify-center bg-gray-100 hover:bg-gray-300 rounded leading-none text-xs font-bold" title="Izquierda">←</button>
-                    <button id="tt-move-down" class="w-6 h-6 flex items-center justify-center bg-gray-100 hover:bg-gray-300 rounded leading-none text-xs font-bold" title="Bajar">↓</button>
-                    <button id="tt-move-right" class="w-6 h-6 flex items-center justify-center bg-gray-100 hover:bg-gray-300 rounded leading-none text-xs font-bold" title="Derecha">→</button>
+                    <button id="tt-move-left" class="w-6 h-6 flex items-center justify-center bg-gray-100 hover:bg-gray-300 rounded leading-none text-xs font-bold transition-colors" title="Izquierda">←</button>
+                    <button id="tt-move-down" class="w-6 h-6 flex items-center justify-center bg-gray-100 hover:bg-gray-300 rounded leading-none text-xs font-bold transition-colors" title="Bajar">↓</button>
+                    <button id="tt-move-right" class="w-6 h-6 flex items-center justify-center bg-gray-100 hover:bg-gray-300 rounded leading-none text-xs font-bold transition-colors" title="Derecha">→</button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Panel Editor de Fondo de Sección -->
-    <div id="sectionToolbar" class="hidden fixed top-1/2 right-6 transform -translate-y-1/2 z-[80] bg-white p-5 rounded-2xl shadow-2xl border border-gray-200 font-sans w-64">
+    <div id="sectionToolbar" class="hidden fixed top-1/2 right-6 transform -translate-y-1/2 z-[90] bg-white p-5 rounded-2xl shadow-2xl border border-gray-200 font-sans w-64">
         <h4 class="font-bold mb-1 text-gray-800">Fondo de Sección</h4>
         <p class="text-[10px] text-gray-500 mb-4">Editando: <span id="st-name" class="font-bold text-[var(--color-primary)]"></span></p>
         
         <label class="block text-xs font-bold mb-1 text-gray-700">Color de Fondo</label>
-        <input type="color" id="st-bg-color" class="w-full h-10 mb-4 cursor-pointer rounded">
+        <input type="color" id="st-bg-color" class="w-full h-10 mb-4 cursor-pointer rounded border border-gray-300">
         
         <label class="block text-xs font-bold mb-1 text-gray-700">Imagen de Fondo (URL)</label>
         <input type="text" id="st-bg-image" class="w-full border border-gray-300 p-2 mb-4 text-xs rounded outline-none focus:border-[var(--color-primary)]" placeholder="https://ejemplo.com/foto.jpg">
@@ -204,7 +207,7 @@
 
     <!-- Header / Nav -->
     <header id="sec-header" class="relative fixed w-full z-50 bg-[var(--color-bg-light)]/90 backdrop-blur-md border-b border-[var(--color-primary)]/20 transition-all duration-300">
-        <div class="section-edit-btn" onclick="openSectionEditor('sec-header')">🎨 Fondo</div>
+        <div class="section-edit-btn" onclick="openSectionEditor('sec-header')">🎨 Fondo Header</div>
         <nav class="container mx-auto px-6 py-4 flex justify-between items-center relative z-10">
             <div class="text-2xl font-display font-bold text-[var(--color-primary)] tracking-widest uppercase edit-text transition-all" data-key="nav-logo">
                 DULCESAL
@@ -222,9 +225,8 @@
 
     <!-- Hero Section -->
     <section id="sec-inicio" class="relative h-screen flex items-center justify-center overflow-hidden bg-[var(--color-bg-dark)] bg-cover bg-center transition-all duration-300">
-        <div class="section-edit-btn" onclick="openSectionEditor('sec-inicio')">🎨 Fondo</div>
+        <div class="section-edit-btn" onclick="openSectionEditor('sec-inicio')">🎨 Fondo Inicio</div>
         <div class="absolute inset-0 z-0 relative group image-container pointer-events-none">
-            <!-- Capa de imagen de fondo editable como objeto -->
             <img src="https://images.unsplash.com/photo-1555507036-ab1f40ce88cb?q=80&w=1920&auto=format&fit=crop" 
                  alt="Background" 
                  class="w-full h-full object-cover opacity-50 edit-image pointer-events-auto"
@@ -249,7 +251,7 @@
 
     <!-- Categories -->
     <section id="sec-productos" class="relative py-20 bg-[var(--color-bg-light)] bg-cover bg-center transition-all duration-500">
-        <div class="section-edit-btn" onclick="openSectionEditor('sec-productos')">🎨 Fondo</div>
+        <div class="section-edit-btn" onclick="openSectionEditor('sec-productos')">🎨 Fondo Productos</div>
         <div class="container mx-auto px-6 relative z-10">
             <div class="text-center mb-16">
                 <h2 class="text-4xl font-display text-[var(--color-text-dark)] mb-4 edit-text transition-all" data-key="prod-title">Nuestras Creaciones</h2>
@@ -257,29 +259,29 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
-                <div class="product-card group bg-white p-4 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden border border-[var(--color-primary)]/10">
+                <div class="product-card group bg-white p-4 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden border border-[var(--color-primary)]/10 relative">
                     <div class="relative overflow-hidden rounded-xl h-64 mb-4 image-container">
                         <img src="https://images.unsplash.com/photo-1621303837174-89787a7d4729?q=80&w=800&auto=format&fit=crop" class="w-full h-full object-cover transition-transform duration-700 edit-image" data-key="img-prod-1">
                         <div class="image-edit-overlay rounded-xl"><span class="bg-white text-gray-900 px-4 py-2 rounded-lg font-sans text-sm font-bold">Cambiar Imagen</span></div>
                     </div>
-                    <h3 class="text-xl font-display mb-2 text-center text-[var(--color-text-dark)] edit-text transition-all" data-key="title-prod-1">Pastelería Moderna</h3>
-                    <p class="text-[var(--color-text-dark)]/70 text-sm text-center font-light mb-4 edit-text transition-all" data-key="desc-prod-1">Tortas de diseño, entremets y texturas innovadoras para paladares exigentes.</p>
+                    <h3 class="text-xl font-display mb-2 text-center text-[var(--color-text-dark)] edit-text transition-all block" data-key="title-prod-1">Pastelería Moderna</h3>
+                    <p class="text-[var(--color-text-dark)]/70 text-sm text-center font-light mb-4 edit-text transition-all block" data-key="desc-prod-1">Tortas de diseño, entremets y texturas innovadoras para paladares exigentes.</p>
                 </div>
-                <div class="product-card group bg-white p-4 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden border border-[var(--color-primary)]/10">
+                <div class="product-card group bg-white p-4 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden border border-[var(--color-primary)]/10 relative">
                     <div class="relative overflow-hidden rounded-xl h-64 mb-4 image-container">
                         <img src="https://images.unsplash.com/photo-1603532648955-039310d9ed75?q=80&w=800&auto=format&fit=crop" class="w-full h-full object-cover transition-transform duration-700 edit-image" data-key="img-prod-2">
                         <div class="image-edit-overlay rounded-xl"><span class="bg-white text-gray-900 px-4 py-2 rounded-lg font-sans text-sm font-bold">Cambiar Imagen</span></div>
                     </div>
-                    <h3 class="text-xl font-display mb-2 text-center text-[var(--color-text-dark)] edit-text transition-all" data-key="title-prod-2">Opciones Saladas</h3>
-                    <p class="text-[var(--color-text-dark)]/70 text-sm text-center font-light mb-4 edit-text transition-all" data-key="desc-prod-2">Sandwiches de miga premium, fosforitos, chips y bocados irresistibles para tu evento.</p>
+                    <h3 class="text-xl font-display mb-2 text-center text-[var(--color-text-dark)] edit-text transition-all block" data-key="title-prod-2">Opciones Saladas</h3>
+                    <p class="text-[var(--color-text-dark)]/70 text-sm text-center font-light mb-4 edit-text transition-all block" data-key="desc-prod-2">Sandwiches de miga premium, fosforitos, chips y bocados irresistibles para tu evento.</p>
                 </div>
-                <div class="product-card group bg-white p-4 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden border border-[var(--color-primary)]/10">
+                <div class="product-card group bg-white p-4 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden border border-[var(--color-primary)]/10 relative">
                     <div class="relative overflow-hidden rounded-xl h-64 mb-4 image-container">
                         <img src="https://images.unsplash.com/photo-1499638673689-79a0b5115d87?q=80&w=800&auto=format&fit=crop" class="w-full h-full object-cover transition-transform duration-700 edit-image" data-key="img-prod-3">
                         <div class="image-edit-overlay rounded-xl"><span class="bg-white text-gray-900 px-4 py-2 rounded-lg font-sans text-sm font-bold">Cambiar Imagen</span></div>
                     </div>
-                    <h3 class="text-xl font-display mb-2 text-center text-[var(--color-text-dark)] edit-text transition-all" data-key="title-prod-3">Mesas Dulces</h3>
-                    <p class="text-[var(--color-text-dark)]/70 text-sm text-center font-light mb-4 edit-text transition-all" data-key="desc-prod-3">Shots, alfajorcitos, brownies y variedad de cuadrados para compartir.</p>
+                    <h3 class="text-xl font-display mb-2 text-center text-[var(--color-text-dark)] edit-text transition-all block" data-key="title-prod-3">Mesas Dulces</h3>
+                    <p class="text-[var(--color-text-dark)]/70 text-sm text-center font-light mb-4 edit-text transition-all block" data-key="desc-prod-3">Shots, alfajorcitos, brownies y variedad de cuadrados para compartir.</p>
                 </div>
             </div>
 
@@ -294,7 +296,7 @@
 
     <!-- Nosotros Section -->
     <section id="sec-nosotros" class="relative py-20 bg-white bg-cover bg-center transition-all duration-300">
-        <div class="section-edit-btn" onclick="openSectionEditor('sec-nosotros')">🎨 Fondo</div>
+        <div class="section-edit-btn" onclick="openSectionEditor('sec-nosotros')">🎨 Fondo Nosotros</div>
         <div class="container mx-auto px-6 flex flex-col md:flex-row items-center gap-12 relative z-10">
             <div class="md:w-1/2 w-full">
                 <div class="relative p-4 image-container">
@@ -305,19 +307,19 @@
             </div>
             <div class="md:w-1/2 space-y-6">
                 <span class="text-[var(--color-primary)] font-sans font-bold tracking-widest uppercase text-xs edit-text transition-all block" data-key="about-subtitle">Nuestra Filosofía</span>
-                <h2 class="text-4xl font-display text-[var(--color-text-dark)] edit-text transition-all" data-key="about-title">El alma de Dulcesal</h2>
-                <p class="text-[var(--color-text-dark)]/80 leading-relaxed font-light edit-text transition-all" data-key="about-desc-1">En Dulcesal creemos que cada celebración merece ser acompañada por sabores que queden en la memoria. Utilizamos siempre ingredientes reales, manteca, chocolates puros y mucho amor.</p>
-                <p class="text-[var(--color-text-dark)]/80 leading-relaxed font-light italic border-l-4 border-[var(--color-primary)]/50 pl-4 edit-text transition-all" data-key="about-desc-2">"Buscamos ese punto perfecto donde lo dulce reconforta y lo salado sorprende."</p>
+                <h2 class="text-4xl font-display text-[var(--color-text-dark)] edit-text transition-all block" data-key="about-title">El alma de Dulcesal</h2>
+                <p class="text-[var(--color-text-dark)]/80 leading-relaxed font-light edit-text transition-all block" data-key="about-desc-1">En Dulcesal creemos que cada celebración merece ser acompañada por sabores que queden en la memoria. Utilizamos siempre ingredientes reales, manteca, chocolates puros y mucho amor.</p>
+                <p class="text-[var(--color-text-dark)]/80 leading-relaxed font-light italic border-l-4 border-[var(--color-primary)]/50 pl-4 edit-text transition-all block" data-key="about-desc-2">"Buscamos ese punto perfecto donde lo dulce reconforta y lo salado sorprende."</p>
             </div>
         </div>
     </section>
 
     <!-- Galería -->
     <section id="sec-galeria" class="relative py-20 bg-[var(--color-bg-light)] bg-cover bg-center transition-all duration-300">
-        <div class="section-edit-btn" onclick="openSectionEditor('sec-galeria')">🎨 Fondo</div>
+        <div class="section-edit-btn" onclick="openSectionEditor('sec-galeria')">🎨 Fondo Galería</div>
         <div class="container mx-auto px-6 relative z-10">
             <div class="text-center mb-16">
-                <h2 class="text-4xl font-display text-[var(--color-text-dark)] mb-4 edit-text transition-all" data-key="gallery-title">Nuestros Trabajos</h2>
+                <h2 class="text-4xl font-display text-[var(--color-text-dark)] mb-4 edit-text transition-all block" data-key="gallery-title">Nuestros Trabajos</h2>
                 <div class="w-24 h-px bg-[var(--color-primary)] mx-auto"></div>
             </div>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
@@ -331,16 +333,16 @@
 
     <!-- FAQ -->
     <section id="sec-faq" class="relative py-20 bg-white bg-cover bg-center transition-all duration-300">
-        <div class="section-edit-btn" onclick="openSectionEditor('sec-faq')">🎨 Fondo</div>
+        <div class="section-edit-btn" onclick="openSectionEditor('sec-faq')">🎨 Fondo FAQ</div>
         <div class="container mx-auto px-6 max-w-3xl relative z-10">
             <div class="text-center mb-16">
-                <h2 class="text-4xl font-display text-[var(--color-text-dark)] mb-4 edit-text transition-all" data-key="faq-main-title">Preguntas Frecuentes</h2>
+                <h2 class="text-4xl font-display text-[var(--color-text-dark)] mb-4 edit-text transition-all block" data-key="faq-main-title">Preguntas Frecuentes</h2>
                 <div class="w-24 h-px bg-[var(--color-primary)] mx-auto"></div>
             </div>
             <div class="space-y-6">
                 <div class="bg-[var(--color-bg-light)] p-6 rounded-2xl shadow-sm border border-[var(--color-primary)]/10">
-                    <h3 class="font-bold text-[var(--color-text-dark)] text-lg mb-2 edit-text transition-all" data-key="faq-q1">¿Con cuánta anticipación debo hacer mi pedido?</h3>
-                    <p class="text-[var(--color-text-dark)]/70 font-light edit-text transition-all" data-key="faq-a1">Para tortas personalizadas pedimos mínimo 7 días de anticipación. Para productos de vitrina y salados, 48 a 72 horas.</p>
+                    <h3 class="font-bold text-[var(--color-text-dark)] text-lg mb-2 edit-text transition-all block" data-key="faq-q1">¿Con cuánta anticipación debo hacer mi pedido?</h3>
+                    <p class="text-[var(--color-text-dark)]/70 font-light edit-text transition-all block" data-key="faq-a1">Para tortas personalizadas pedimos mínimo 7 días de anticipación. Para productos de vitrina y salados, 48 a 72 horas.</p>
                 </div>
             </div>
         </div>
@@ -348,10 +350,10 @@
 
     <!-- Contacto -->
     <section id="sec-contacto" class="relative py-20 bg-[var(--color-bg-light)] bg-cover bg-center transition-all duration-300">
-        <div class="section-edit-btn" onclick="openSectionEditor('sec-contacto')">🎨 Fondo</div>
+        <div class="section-edit-btn" onclick="openSectionEditor('sec-contacto')">🎨 Fondo Contacto</div>
         <div class="container mx-auto px-6 text-center relative z-10">
             <div class="max-w-3xl mx-auto bg-white p-10 rounded-3xl shadow-xl border border-[var(--color-primary)]/10">
-                <h2 class="text-4xl font-display mb-4 text-[var(--color-text-dark)] edit-text transition-all" data-key="contact-title">Hagamos tu pedido</h2>
+                <h2 class="text-4xl font-display mb-4 text-[var(--color-text-dark)] edit-text transition-all block" data-key="contact-title">Hagamos tu pedido</h2>
                 <div class="mt-8 flex flex-col justify-center items-center gap-6">
                     <div class="edit-text transition-all inline-block" data-key="ig-btn-container">
                         <a href="https://www.instagram.com/dulcesal_pasteleria" target="_blank" class="flex items-center gap-4 hover:scale-105 transition-transform bg-[var(--color-bg-light)] px-6 py-4 rounded-2xl border border-[var(--color-primary)]/20">
@@ -365,10 +367,10 @@
 
     <!-- Footer -->
     <footer id="sec-footer" class="relative bg-[var(--color-bg-dark)] text-white py-12 bg-cover bg-center transition-all duration-300">
-        <div class="section-edit-btn" onclick="openSectionEditor('sec-footer')">🎨 Fondo</div>
+        <div class="section-edit-btn" onclick="openSectionEditor('sec-footer')">🎨 Fondo Footer</div>
         <div class="container mx-auto px-6 text-center relative z-10">
-            <h2 id="secretAdminTrigger" class="text-2xl font-display italic mb-4 text-white select-none edit-text transition-all" data-key="footer-logo" title="Doble clic para admin">Dulcesal</h2>
-            <p class="text-[var(--color-primary)] text-xs tracking-widest uppercase mb-8 edit-text transition-all block" data-key="footer-slogan">Hecho a mano, con el corazón</p>
+            <h2 id="secretAdminTrigger" class="text-2xl font-display italic mb-4 text-white select-none edit-text transition-all inline-block" data-key="footer-logo" title="Doble clic para admin">Dulcesal</h2>
+            <p class="text-[var(--color-primary)] text-xs tracking-widest uppercase mb-8 edit-text transition-all block mx-auto" data-key="footer-slogan">Hecho a mano, con el corazón</p>
         </div>
     </footer>
 
@@ -404,13 +406,13 @@
         let activeTextElement = null;
         let activeSectionId = null;
         
-        // Estructura de datos completa
+        // Estructura de datos
         let localData = { 
             theme: {}, 
             text: {}, 
             images: {}, 
-            elementStyles: {}, // Tamaños, colores, alineación y márgenes de textos
-            sectionStyles: {}  // Fondos y colores de secciones
+            elementStyles: {}, 
+            sectionStyles: {} 
         };
 
         // Elementos UI
@@ -433,7 +435,7 @@
         };
         initAuth();
 
-        // 3. SINCRONIZACIÓN EN TIEMPO REAL
+        // 3. SINCRONIZACIÓN
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
             if (user) {
@@ -451,7 +453,7 @@
             }
         });
 
-        // 4. FUNCIONES DE APLICACIÓN A LA PÁGINA
+        // 4. APLICAR DATOS
         function applyThemeFromDB(themeObj) {
             const inputs = {
                 'colorPrimary': '--color-primary', 'colorBgLight': '--color-bg-light',
@@ -495,7 +497,7 @@
             });
         }
 
-        // 5. GUARDADO EN FIRESTORE
+        // 5. GUARDADO
         let saveTimeout;
         async function saveToDB() {
             if (!currentUser || !isEditMode) return;
@@ -507,39 +509,45 @@
             } catch (e) { console.error("Error guardando:", e); }
         }
 
-        // 6. HERRAMIENTAS DE EDICIÓN AVANZADAS
+        // 6. EVENTOS DE EDICIÓN
         
-        // Evitar perder el foco al hacer click en las barras de herramientas
+        // Evitar que hacer clic en la barra de herramientas quite el foco del texto
         [textToolbar, sectionToolbar, themePanel].forEach(panel => {
             panel.addEventListener('mousedown', (e) => {
                 if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'SELECT') {
-                    e.preventDefault();
+                    e.preventDefault(); 
                 }
             });
         });
 
-        // Activar barra de formato de texto
+        // Configurar los textos editables
         document.querySelectorAll('.edit-text').forEach(el => {
+            // Cuando le hacemos click
             el.addEventListener('focus', (e) => {
                 if (!isEditMode) return;
                 activeTextElement = e.target;
-                textToolbar.classList.remove('hidden');
+                textToolbar.classList.remove('hidden'); // Mostrar barra superior
                 
-                // Extraer color actual para el picker
+                // Actualizar el color picker al color actual del texto
                 const rgb = window.getComputedStyle(activeTextElement).color;
-                const hex = rgbToHex(rgb);
-                document.getElementById('tt-color').value = hex;
+                document.getElementById('tt-color').value = rgbToHex(rgb);
             });
             
+            // Cuando dejamos de editar (hacemos click afuera)
             el.addEventListener('blur', () => {
                 if (!isEditMode) return;
+                
+                // Guardar el texto que acabamos de escribir
                 localData.text = localData.text || {};
                 localData.text[el.dataset.key] = el.innerHTML;
                 saveToDB();
                 
-                // Pequeño delay para ocultar la barra por si clickeamos un botón de la misma
+                // Ocultar la barra solo si no hicimos click en un botón de la misma barra
                 setTimeout(() => {
-                    if(document.activeElement !== activeTextElement) textToolbar.classList.add('hidden');
+                    if(document.activeElement !== activeTextElement) {
+                        textToolbar.classList.add('hidden');
+                        activeTextElement = null;
+                    }
                 }, 200);
             });
             
@@ -548,7 +556,7 @@
             });
         });
 
-        // Funciones de la Barra de Texto
+        // Funciones de la Barra de Herramientas de Texto
         const updateTextFormat = (styleProp, value, modifyExisting = false) => {
             if(!activeTextElement) return;
             
@@ -564,6 +572,7 @@
             saveToDB();
         };
 
+        // Asignar botones de la barra de texto
         document.getElementById('tt-size-up').onclick = () => updateTextFormat('fontSize', 2, true);
         document.getElementById('tt-size-down').onclick = () => updateTextFormat('fontSize', -2, true);
         document.getElementById('tt-align-left').onclick = () => updateTextFormat('textAlign', 'left');
@@ -575,8 +584,9 @@
         document.getElementById('tt-move-right').onclick = () => updateTextFormat('marginLeft', 5, true);
         document.getElementById('tt-color').addEventListener('input', (e) => updateTextFormat('color', e.target.value));
 
-        // Función para abrir Editor de Sección
+        // Editor de Fondo de Sección
         window.openSectionEditor = (sectionId) => {
+            if (!isEditMode) return;
             activeSectionId = sectionId;
             sectionToolbar.classList.remove('hidden');
             document.getElementById('st-name').textContent = sectionId.replace('sec-', '').toUpperCase();
@@ -587,7 +597,6 @@
             document.getElementById('st-bg-image').value = secEl.style.backgroundImage.replace(/url\(['"]?(.*?)['"]?\)/i, "$1") || '';
         };
 
-        // Funciones del Panel de Sección
         const updateSectionBg = () => {
             if(!activeSectionId) return;
             const secEl = document.getElementById(activeSectionId);
@@ -619,10 +628,9 @@
             localData.sectionStyles[activeSectionId] = secEl.style.cssText;
             saveToDB();
         };
-        
         document.getElementById('st-close').onclick = () => sectionToolbar.classList.add('hidden');
 
-        // Edición de Imágenes Normales
+        // Edición de Imágenes
         document.querySelectorAll('.image-edit-overlay').forEach(overlay => {
             overlay.addEventListener('click', function() {
                 if (!isEditMode) return;
@@ -654,20 +662,20 @@
             });
         });
 
-        // 7. INICIO DE SESIÓN ADMIN (NUEVA CONTRASEÑA)
+        // 7. INICIO SESIÓN (CONTRASEÑA: dulcesal2026)
         if (sessionStorage.getItem('dulcesal_admin') === 'true') adminBtn.classList.remove('hidden');
 
         secretTrigger.addEventListener('dblclick', () => {
             if (sessionStorage.getItem('dulcesal_admin') !== 'true') {
                 const password = prompt("Administrador: Ingrese la contraseña:");
-                if (password === "dulcesal2026") { // CONTRASEÑA ACTUALIZADA
+                if (password === "dulcesal2026") {
                     sessionStorage.setItem('dulcesal_admin', 'true');
                     adminBtn.classList.remove('hidden');
                 } else if (password) alert("Contraseña incorrecta.");
             }
         });
 
-        // Activar Modo Editor
+        // Toggle Edit Mode
         adminBtn.addEventListener('click', () => {
             isEditMode = !isEditMode;
             document.body.classList.toggle('editable-mode', isEditMode);
@@ -686,6 +694,7 @@
                 themePanel.classList.add('hidden');
                 textToolbar.classList.add('hidden');
                 sectionToolbar.classList.add('hidden');
+                activeTextElement = null;
                 document.querySelectorAll('.edit-text').forEach(el => {
                     el.contentEditable = "false";
                     el.classList.remove('editable-active');
@@ -698,7 +707,6 @@
             link.addEventListener('click', (e) => { if (isEditMode) e.preventDefault(); });
         });
 
-        // Utilidad: Convertir RGB a HEX para los color pickers
         function rgbToHex(rgb) {
             if(!rgb || rgb.indexOf('rgb') === -1) return '#000000';
             const colors = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
