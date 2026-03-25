@@ -238,7 +238,7 @@
         <div class="absolute z-10 text-center px-6 fade-in w-full max-w-4xl">
             <span class="text-[var(--color-primary)] tracking-[0.3em] uppercase text-sm mb-4 block edit-text transition-all" data-key="hero-subtitle">El equilibrio perfecto</span>
             <h1 class="text-5xl md:text-7xl mb-6 font-display text-white italic edit-text transition-all" data-key="hero-title">Arte en cada bocado</h1>
-            <p class="text-lg md:text-xl text-white/80 max-w-2xl mx-auto mb-8 font-light edit-text transition-all" data-key="hero-desc">
+            <p class="text-lg md:text-xl text-white/80 max-w-2xl mx-auto mb-8 font-light edit-text transition-all block" data-key="hero-desc">
                 Pastelería artesanal donde lo clásico se encuentra con lo moderno. Sabores que despiertan emociones.
             </p>
             <div class="edit-text transition-all inline-block" data-key="hero-btn-container">
@@ -254,7 +254,7 @@
         <div class="section-edit-btn" onclick="openSectionEditor('sec-productos')">🎨 Fondo Productos</div>
         <div class="container mx-auto px-6 relative z-10">
             <div class="text-center mb-16">
-                <h2 class="text-4xl font-display text-[var(--color-text-dark)] mb-4 edit-text transition-all" data-key="prod-title">Nuestras Creaciones</h2>
+                <h2 class="text-4xl font-display text-[var(--color-text-dark)] mb-4 edit-text transition-all block" data-key="prod-title">Nuestras Creaciones</h2>
                 <div class="w-24 h-px bg-[var(--color-primary)] mx-auto"></div>
             </div>
 
@@ -285,7 +285,7 @@
                 </div>
             </div>
 
-            <div class="mt-16 text-center edit-text transition-all" data-key="btn-menu-container">
+            <div class="mt-16 text-center edit-text transition-all block" data-key="btn-menu-container">
                 <a href="#" target="_blank" class="inline-flex items-center gap-2 bg-[var(--color-primary)] text-white px-8 py-4 rounded-full hover:opacity-80 transition-transform hover:scale-105 shadow-lg font-sans uppercase tracking-widest text-sm font-medium">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clip-rule="evenodd" /></svg>
                     <span>Ver Lista de Precios Completa</span>
@@ -369,7 +369,7 @@
     <footer id="sec-footer" class="relative bg-[var(--color-bg-dark)] text-white py-12 bg-cover bg-center transition-all duration-300">
         <div class="section-edit-btn" onclick="openSectionEditor('sec-footer')">🎨 Fondo Footer</div>
         <div class="container mx-auto px-6 text-center relative z-10">
-            <h2 id="secretAdminTrigger" class="text-2xl font-display italic mb-4 text-white select-none edit-text transition-all inline-block" data-key="footer-logo" title="Doble clic para admin">Dulcesal</h2>
+            <h2 id="secretAdminTrigger" class="text-2xl font-display italic mb-4 text-white select-none edit-text transition-all inline-block cursor-pointer" data-key="footer-logo" title="Doble clic para admin">Dulcesal</h2>
             <p class="text-[var(--color-primary)] text-xs tracking-widest uppercase mb-8 edit-text transition-all block mx-auto" data-key="footer-slogan">Hecho a mano, con el corazón</p>
         </div>
     </footer>
@@ -417,6 +417,7 @@
 
         // Elementos UI
         const adminBtn = document.getElementById('adminToggle');
+        const adminBtnText = document.getElementById('adminToggleText');
         const themePanel = document.getElementById('themePanel');
         const textToolbar = document.getElementById('textToolbar');
         const sectionToolbar = document.getElementById('sectionToolbar');
@@ -511,9 +512,10 @@
 
         // 6. EVENTOS DE EDICIÓN
         
-        // Evitar que hacer clic en la barra de herramientas quite el foco del texto
+        // Evitar que hacer clic en los paneles de herramientas quite el foco del texto
         [textToolbar, sectionToolbar, themePanel].forEach(panel => {
             panel.addEventListener('mousedown', (e) => {
+                // Solo si no estamos clickeando en un input o select, prevenimos que se pierda el foco
                 if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'SELECT') {
                     e.preventDefault(); 
                 }
@@ -522,29 +524,27 @@
 
         // Configurar los textos editables
         document.querySelectorAll('.edit-text').forEach(el => {
-            // Cuando le hacemos click
             el.addEventListener('focus', (e) => {
                 if (!isEditMode) return;
                 activeTextElement = e.target;
-                textToolbar.classList.remove('hidden'); // Mostrar barra superior
+                textToolbar.classList.remove('hidden'); 
                 
                 // Actualizar el color picker al color actual del texto
                 const rgb = window.getComputedStyle(activeTextElement).color;
                 document.getElementById('tt-color').value = rgbToHex(rgb);
             });
             
-            // Cuando dejamos de editar (hacemos click afuera)
-            el.addEventListener('blur', () => {
+            el.addEventListener('blur', (e) => {
                 if (!isEditMode) return;
                 
-                // Guardar el texto que acabamos de escribir
+                // Guardar el texto escrito
                 localData.text = localData.text || {};
                 localData.text[el.dataset.key] = el.innerHTML;
                 saveToDB();
                 
-                // Ocultar la barra solo si no hicimos click en un botón de la misma barra
+                // Si el usuario hace click afuera (y no en la barra de herramientas), ocultarla
                 setTimeout(() => {
-                    if(document.activeElement !== activeTextElement) {
+                    if (document.activeElement !== activeTextElement && !textToolbar.contains(document.activeElement)) {
                         textToolbar.classList.add('hidden');
                         activeTextElement = null;
                     }
@@ -560,13 +560,21 @@
         const updateTextFormat = (styleProp, value, modifyExisting = false) => {
             if(!activeTextElement) return;
             
+            // Para que los márgenes funcionen en elementos "inline" (como span o a), forzamos que sean inline-block
+            const currentDisplay = window.getComputedStyle(activeTextElement).display;
+            if ((styleProp.includes('margin') || styleProp === 'textAlign') && currentDisplay === 'inline') {
+                activeTextElement.style.display = 'inline-block';
+            }
+
             if (modifyExisting) {
-                let currentVal = parseInt(window.getComputedStyle(activeTextElement)[styleProp]) || 0;
+                let currentVal = parseInt(window.getComputedStyle(activeTextElement)[styleProp]);
+                if (isNaN(currentVal)) currentVal = 0; // Si no tenía margen, empezamos en 0
                 activeTextElement.style[styleProp] = (currentVal + value) + 'px';
             } else {
                 activeTextElement.style[styleProp] = value;
             }
             
+            // Guardar estilos del elemento específico
             localData.elementStyles = localData.elementStyles || {};
             localData.elementStyles[activeTextElement.dataset.key] = activeTextElement.style.cssText;
             saveToDB();
@@ -671,7 +679,11 @@
                 if (password === "dulcesal2026") {
                     sessionStorage.setItem('dulcesal_admin', 'true');
                     adminBtn.classList.remove('hidden');
-                } else if (password) alert("Contraseña incorrecta.");
+                } else if (password !== null) {
+                    alert("Contraseña incorrecta.");
+                }
+            } else {
+                alert("Ya tienes iniciada la sesión de administrador.");
             }
         });
 
@@ -707,6 +719,7 @@
             link.addEventListener('click', (e) => { if (isEditMode) e.preventDefault(); });
         });
 
+        // Utilidad: Convierte colores RGB a Hexadecimal para que el selector de color funcione bien
         function rgbToHex(rgb) {
             if(!rgb || rgb.indexOf('rgb') === -1) return '#000000';
             const colors = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
