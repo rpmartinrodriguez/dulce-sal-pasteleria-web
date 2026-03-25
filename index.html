@@ -48,7 +48,7 @@
             outline-offset: 4px;
             background-color: rgba(0,0,0, 0.05);
             cursor: text;
-            transition: all 0.2s;
+            transition: all 0.2s, margin 0.2s ease, font-size 0.2s ease;
             border-radius: 4px;
         }
         .editable-active:hover {
@@ -104,34 +104,43 @@
     </div>
 
     <!-- Barra de Herramientas de Texto Avanzada -->
-    <div id="textToolbar" class="hidden fixed top-24 left-1/2 transform -translate-x-1/2 z-[90] bg-white p-2 rounded-xl shadow-2xl border border-gray-200 flex gap-4 items-center font-sans text-sm">
-        <div class="flex flex-col items-center">
-            <span class="text-[10px] text-gray-500 font-bold mb-1">Tamaño</span>
-            <div class="flex gap-1">
-                <button id="tt-size-down" class="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded font-bold">-</button>
-                <button id="tt-size-up" class="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded font-bold">+</button>
+    <div id="textToolbar" class="hidden fixed top-24 left-1/2 transform -translate-x-1/2 z-[90] bg-white p-4 rounded-2xl shadow-2xl border border-gray-200 flex flex-col gap-3 font-sans text-sm w-max">
+        <div class="text-[11px] text-pink-600 font-bold text-center bg-pink-50 rounded-lg p-2 border border-pink-100">
+            ✏️ Escribe directamente en la página para cambiar los textos
+        </div>
+        <div class="flex gap-5 items-center justify-center">
+            <div class="flex flex-col items-center">
+                <span class="text-[10px] text-gray-500 font-bold mb-1">Tamaño</span>
+                <div class="flex gap-1">
+                    <button id="tt-size-down" class="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded font-bold">-</button>
+                    <button id="tt-size-up" class="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded font-bold">+</button>
+                </div>
             </div>
-        </div>
-        <div class="w-px h-8 bg-gray-200"></div>
-        <div class="flex flex-col items-center">
-            <span class="text-[10px] text-gray-500 font-bold mb-1">Alinear</span>
-            <div class="flex gap-1">
-                <button id="tt-align-left" class="px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded">⬅️</button>
-                <button id="tt-align-center" class="px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded">⏺️</button>
-                <button id="tt-align-right" class="px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded">➡️</button>
+            <div class="w-px h-10 bg-gray-200"></div>
+            <div class="flex flex-col items-center">
+                <span class="text-[10px] text-gray-500 font-bold mb-1">Alinear</span>
+                <div class="flex gap-1">
+                    <button id="tt-align-left" class="px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded">⬅️</button>
+                    <button id="tt-align-center" class="px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded">⏺️</button>
+                    <button id="tt-align-right" class="px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded">➡️</button>
+                </div>
             </div>
-        </div>
-        <div class="w-px h-8 bg-gray-200"></div>
-        <div class="flex flex-col items-center">
-            <span class="text-[10px] text-gray-500 font-bold mb-1">Color de Texto</span>
-            <input type="color" id="tt-color" class="w-8 h-6 cursor-pointer rounded border-0 p-0">
-        </div>
-        <div class="w-px h-8 bg-gray-200"></div>
-        <div class="flex flex-col items-center">
-            <span class="text-[10px] text-gray-500 font-bold mb-1">Mover (Margen)</span>
-            <div class="flex gap-1">
-                <button id="tt-margin-up" class="px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded" title="Subir">↑</button>
-                <button id="tt-margin-down" class="px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded" title="Bajar">↓</button>
+            <div class="w-px h-10 bg-gray-200"></div>
+            <div class="flex flex-col items-center">
+                <span class="text-[10px] text-gray-500 font-bold mb-1">Color</span>
+                <input type="color" id="tt-color" class="w-8 h-8 cursor-pointer rounded-full border border-gray-300 p-0 shadow-sm">
+            </div>
+            <div class="w-px h-10 bg-gray-200"></div>
+            <div class="flex flex-col items-center">
+                <span class="text-[10px] text-gray-500 font-bold mb-1">Mover Libremente</span>
+                <div class="grid grid-cols-3 gap-1 place-items-center">
+                    <div></div>
+                    <button id="tt-move-up" class="w-6 h-6 flex items-center justify-center bg-gray-100 hover:bg-gray-300 rounded leading-none text-xs font-bold" title="Subir">↑</button>
+                    <div></div>
+                    <button id="tt-move-left" class="w-6 h-6 flex items-center justify-center bg-gray-100 hover:bg-gray-300 rounded leading-none text-xs font-bold" title="Izquierda">←</button>
+                    <button id="tt-move-down" class="w-6 h-6 flex items-center justify-center bg-gray-100 hover:bg-gray-300 rounded leading-none text-xs font-bold" title="Bajar">↓</button>
+                    <button id="tt-move-right" class="w-6 h-6 flex items-center justify-center bg-gray-100 hover:bg-gray-300 rounded leading-none text-xs font-bold" title="Derecha">→</button>
+                </div>
             </div>
         </div>
     </div>
@@ -560,8 +569,10 @@
         document.getElementById('tt-align-left').onclick = () => updateTextFormat('textAlign', 'left');
         document.getElementById('tt-align-center').onclick = () => updateTextFormat('textAlign', 'center');
         document.getElementById('tt-align-right').onclick = () => updateTextFormat('textAlign', 'right');
-        document.getElementById('tt-margin-up').onclick = () => updateTextFormat('marginTop', -5, true);
-        document.getElementById('tt-margin-down').onclick = () => updateTextFormat('marginTop', 5, true);
+        document.getElementById('tt-move-up').onclick = () => updateTextFormat('marginTop', -5, true);
+        document.getElementById('tt-move-down').onclick = () => updateTextFormat('marginTop', 5, true);
+        document.getElementById('tt-move-left').onclick = () => updateTextFormat('marginLeft', -5, true);
+        document.getElementById('tt-move-right').onclick = () => updateTextFormat('marginLeft', 5, true);
         document.getElementById('tt-color').addEventListener('input', (e) => updateTextFormat('color', e.target.value));
 
         // Función para abrir Editor de Sección
