@@ -100,6 +100,10 @@
 </head>
 <body class="antialiased bg-[var(--color-bg-light)]">
 
+    <!-- Inputs ocultos para subir archivos (NUEVO) -->
+    <input type="file" id="globalImageUploader" accept="image/*" class="hidden">
+    <input type="file" id="bgImageUploader" accept="image/*" class="hidden">
+
     <!-- Indicador de Guardado en la Nube -->
     <div id="saveIndicator" class="fixed top-4 left-1/2 -translate-x-1/2 z-[100] bg-green-500 text-white px-4 py-2 rounded-full shadow-lg text-sm font-bold font-sans opacity-0 pointer-events-none flex items-center gap-2">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
@@ -164,8 +168,11 @@
         <label class="block text-xs font-bold mb-1 text-gray-700">Color de Fondo</label>
         <input type="color" id="st-bg-color" class="w-full h-10 mb-4 cursor-pointer rounded border border-gray-300">
         
-        <label class="block text-xs font-bold mb-1 text-gray-700">Imagen de Fondo (URL)</label>
-        <input type="text" id="st-bg-image" class="w-full border border-gray-300 p-2 mb-4 text-xs rounded outline-none focus:border-[var(--color-primary)]" placeholder="https://ejemplo.com/foto.jpg">
+        <label class="block text-xs font-bold mb-1 text-gray-700">Imagen de Fondo</label>
+        <div class="flex gap-2 mb-4">
+            <input type="text" id="st-bg-image" class="w-full border border-gray-300 p-2 text-xs rounded outline-none focus:border-[var(--color-primary)]" placeholder="URL de la imagen...">
+            <button id="st-bg-upload-btn" class="bg-gray-200 hover:bg-gray-300 px-3 py-2 rounded text-xs font-bold transition" title="Subir foto desde PC/Celular">📁</button>
+        </div>
         
         <button id="st-bg-clear" class="w-full bg-red-100 text-red-600 font-bold text-xs py-2 rounded hover:bg-red-200 transition">Quitar Fondos (Resetear)</button>
         <button id="st-close" class="w-full mt-2 bg-gray-100 text-gray-600 font-bold text-xs py-2 rounded hover:bg-gray-200 transition">Cerrar Panel</button>
@@ -174,7 +181,20 @@
     <!-- Panel de Diseño Global (Administrador) -->
     <div id="themePanel" class="hidden fixed top-24 left-6 z-[70] bg-white p-6 rounded-2xl shadow-2xl border border-gray-200 w-80 max-h-[80vh] overflow-y-auto">
         <h3 class="font-bold text-lg mb-2 text-gray-800 font-sans">🎨 Tema Global</h3>
-        <p class="text-xs text-gray-500 mb-6 font-sans">Configuración general de la página.</p>
+        <p class="text-xs text-gray-500 mb-4 font-sans">Configuración general de la página.</p>
+
+        <!-- Selector de Plantillas Rápidas (NUEVO) -->
+        <div class="mb-6 p-3 bg-gray-50 rounded-xl border border-gray-200">
+            <label class="block text-sm font-bold text-gray-800 mb-2 font-sans">🌟 Plantillas Rápidas</label>
+            <select id="themePreset" class="w-full p-2 border border-gray-300 rounded-lg font-sans text-sm outline-none focus:ring-2 focus:ring-[var(--color-primary)] bg-white shadow-sm cursor-pointer">
+                <option value="">-- Elegir un estilo --</option>
+                <option value="dulce">Pastelería (Original rosado)</option>
+                <option value="vintage">Vintage (Cálido y clásico)</option>
+                <option value="moderno">Moderno (Minimalista)</option>
+                <option value="elegante">Elegante (Oscuro y dorado)</option>
+                <option value="rustico">Naturaleza (Tierra y crema)</option>
+            </select>
+        </div>
 
         <label class="block text-sm font-medium text-gray-700 mb-1 font-sans">Color Principal (Acentos, Botones)</label>
         <input type="color" id="colorPrimary" class="w-full h-10 mb-4 cursor-pointer rounded border-gray-300">
@@ -392,6 +412,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
         // ============================================================================
         // CONFIGURACIÓN DE TU FIREBASE (DULCESAL PASTELERÍA)
@@ -409,6 +430,7 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        const storage = getStorage(app); // Inicializamos el Storage de Firebase
         
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'dulcesal-web';
         const dbPath = doc(db, 'artifacts', appId, 'public', 'data', 'website', 'config');
@@ -518,22 +540,56 @@
             if (!currentUser || !isEditMode) return;
             try {
                 await setDoc(dbPath, localData, { merge: true });
+                saveIndicator.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg> Guardado en la nube`;
                 saveIndicator.classList.remove('opacity-0');
                 clearTimeout(saveTimeout);
                 saveTimeout = setTimeout(() => saveIndicator.classList.add('opacity-0'), 2000);
             } catch (e) { console.error("Error guardando:", e); }
         }
 
-        // Evento botón de guardado manual
+        // Evento botón de guardado manual (MODIFICADO para salir)
         manualSaveBtn.addEventListener('click', () => {
             saveToDB();
-            const btnSpan = manualSaveBtn.querySelector('span');
-            const originalText = btnSpan.textContent;
-            btnSpan.textContent = "¡Guardado!";
-            setTimeout(() => {
-                btnSpan.textContent = originalText;
-            }, 2000);
+            
+            // Salir del modo edición automáticamente
+            isEditMode = false;
+            document.body.classList.remove('editable-mode');
+            adminBtn.classList.replace('bg-green-600', 'bg-gray-800');
+            adminBtnText.textContent = "Editar Página";
+            themePanel.classList.add('hidden');
+            textToolbar.classList.add('hidden');
+            sectionToolbar.classList.add('hidden');
+            manualSaveBtn.classList.add('hidden');
+            activeTextElement = null;
+            document.querySelectorAll('.edit-text').forEach(el => {
+                el.contentEditable = "false";
+                el.classList.remove('editable-active');
+            });
+            
+            alert("¡Edición guardada exitosamente! Has salido del modo de edición.");
         });
+
+        // 5.5 SUBIDA DE IMÁGENES A FIREBASE STORAGE (NUEVO)
+        async function uploadImageToStorage(file, callback) {
+            saveIndicator.innerHTML = "Subiendo imagen... ⌛";
+            saveIndicator.classList.remove('opacity-0');
+            
+            try {
+                // Generar nombre de archivo único
+                const storageRef = ref(storage, 'website_images/' + Date.now() + '_' + file.name);
+                const uploadTask = await uploadBytesResumable(storageRef, file);
+                const downloadURL = await getDownloadURL(storageRef);
+                
+                saveIndicator.innerHTML = "¡Imagen subida! ✅";
+                setTimeout(() => saveIndicator.classList.add('opacity-0'), 2000);
+                
+                callback(downloadURL); // Retorna la URL oficial de la imagen subida
+            } catch (error) {
+                console.error("Error subiendo imagen:", error);
+                alert("Error al subir la imagen. Verifica que tengas las 'Reglas de Storage' en Firebase configuradas. Código: " + error.code);
+                saveIndicator.classList.add('opacity-0');
+            }
+        }
 
         // 6. EVENTOS DE EDICIÓN
         
@@ -651,6 +707,22 @@
         document.getElementById('st-bg-color').addEventListener('input', updateSectionBg);
         document.getElementById('st-bg-image').addEventListener('input', updateSectionBg);
         
+        // Subir imagen de fondo de sección desde dispositivo
+        const bgImageUploader = document.getElementById('bgImageUploader');
+        document.getElementById('st-bg-upload-btn').onclick = () => {
+            if(!activeSectionId) return;
+            bgImageUploader.click();
+        };
+        bgImageUploader.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            uploadImageToStorage(file, (url) => {
+                document.getElementById('st-bg-image').value = url;
+                updateSectionBg(); // Aplica la nueva imagen
+            });
+            e.target.value = ''; // Resetear el input
+        });
+
         document.getElementById('st-bg-clear').onclick = () => {
             if(!activeSectionId) return;
             const secEl = document.getElementById(activeSectionId);
@@ -663,19 +735,43 @@
         };
         document.getElementById('st-close').onclick = () => sectionToolbar.classList.add('hidden');
 
-        // Edición de Imágenes
+        // Edición de Imágenes Normales
+        const globalImageUploader = document.getElementById('globalImageUploader');
+        let currentEditingImage = null;
+
         document.querySelectorAll('.image-edit-overlay').forEach(overlay => {
             overlay.addEventListener('click', function() {
                 if (!isEditMode) return;
-                const imgElement = this.previousElementSibling;
-                const newUrl = prompt("Pega la URL de la nueva imagen:", imgElement.src);
-                if (newUrl) {
-                    imgElement.src = newUrl;
-                    localData.images = localData.images || {};
-                    localData.images[imgElement.dataset.key] = newUrl;
-                    saveToDB();
+                currentEditingImage = this.previousElementSibling;
+                
+                // Preguntar si subir o pegar enlace
+                const option = confirm("¿Quieres SUBIR una foto desde tu dispositivo? (Dale a 'Cancelar' si prefieres pegar un link web)");
+                
+                if (option) {
+                    globalImageUploader.click();
+                } else {
+                    const newUrl = prompt("Pega la URL de la nueva imagen:", currentEditingImage.src);
+                    if (newUrl) {
+                        currentEditingImage.src = newUrl;
+                        localData.images = localData.images || {};
+                        localData.images[currentEditingImage.dataset.key] = newUrl;
+                        saveToDB();
+                    }
                 }
             });
+        });
+
+        globalImageUploader.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file || !currentEditingImage) return;
+            
+            uploadImageToStorage(file, (url) => {
+                currentEditingImage.src = url;
+                localData.images = localData.images || {};
+                localData.images[currentEditingImage.dataset.key] = url;
+                saveToDB();
+            });
+            e.target.value = ''; // Reset
         });
 
         // Tema Global
@@ -693,6 +789,45 @@
                 document.documentElement.style.setProperty(cssMap[id], val);
                 saveToDB();
             });
+        });
+
+        // 6.5 PLANTILLAS RÁPIDAS (THEMES)
+        const themePresets = {
+            'dulce': { colorPrimary: '#ec4899', colorBgLight: '#fdf2f8', colorTextDark: '#374151', colorBgDark: '#111827', fontHeading: "'Playfair Display', serif", fontBody: "'Lora', serif" },
+            'vintage': { colorPrimary: '#C68B59', colorBgLight: '#FDFBF7', colorTextDark: '#4A3B32', colorBgDark: '#2C211A', fontHeading: "'Playfair Display', serif", fontBody: "'Lora', serif" },
+            'moderno': { colorPrimary: '#3B82F6', colorBgLight: '#F3F4F6', colorTextDark: '#1F2937', colorBgDark: '#111827', fontHeading: "'Montserrat', sans-serif", fontBody: "'Lato', sans-serif" },
+            'elegante': { colorPrimary: '#D4AF37', colorBgLight: '#FFFFFF', colorTextDark: '#000000', colorBgDark: '#000000', fontHeading: "'Merriweather', serif", fontBody: "'Open Sans', sans-serif" },
+            'rustico': { colorPrimary: '#8B5A2B', colorBgLight: '#F5F5DC', colorTextDark: '#3E2723', colorBgDark: '#3E2723', fontHeading: "'Lora', serif", fontBody: "'Roboto', sans-serif" }
+        };
+
+        document.getElementById('themePreset').addEventListener('change', (e) => {
+            const preset = themePresets[e.target.value];
+            if (!preset) return;
+
+            // Advertencia antes de cambiar
+            if(!confirm("¿Estás seguro? Esto sobrescribirá los colores y fuentes actuales por la plantilla elegida.")) {
+                e.target.value = ""; 
+                return;
+            }
+
+            localData.theme = localData.theme || {};
+            for (const [key, value] of Object.entries(preset)) {
+                // 1. Actualizar el panel lateral
+                const inputEl = document.getElementById(key);
+                if (inputEl) inputEl.value = value.replace(/"/g, "'");
+                
+                // 2. Aplicar el CSS instantáneamente
+                const cssMap = {
+                    'colorPrimary': '--color-primary', 'colorBgLight': '--color-bg-light',
+                    'colorTextDark': '--color-text-dark', 'colorBgDark': '--color-bg-dark',
+                    'fontHeading': '--font-heading', 'fontBody': '--font-body'
+                };
+                document.documentElement.style.setProperty(cssMap[key], value);
+                
+                // 3. Guardar estado
+                localData.theme[key] = value;
+            }
+            saveToDB();
         });
 
         // 7. INICIO SESIÓN (CONTRASEÑA: dulcesal2026)
